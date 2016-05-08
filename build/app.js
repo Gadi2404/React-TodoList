@@ -73,7 +73,7 @@ var App = React.createClass ({
 		if( tasksLeft === 0 )
 			checkAllBtn = true;
 		else if( tasksLeft === arr.length )
-			checkedBtn = false;
+			checkAllBtn = false;
 
 		this.setState({checkeds: checkedArr, listCount: tasksLeft, checkAll: checkAllBtn})
 	},	
