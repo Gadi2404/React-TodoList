@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-var App = React.createClass ({
+export default class App extends Component {
 
-	getInitialState(){
-		return {
+	constructor(props){
+		super(props);
+
+		this.state = {
 			listItems : [],
 			listCount : 0,
 			checkeds : [],
 			checkAll : false
 		}
-	},
+	}
 
 	addToList(e){
 		if( e.keyCode === 13 && e.currentTarget.value.trim() !== ''){
-			
 			var arr = this.state.listItems,
 				checkedArr = this.state.checkeds,
 				checkedItems = checkedArr.filter(checked => checked === true).length;
@@ -25,7 +26,7 @@ var App = React.createClass ({
 
 			this.setState({ listItems: arr, listCount: arr.length - checkedItems, checkeds: checkedArr })
 		}
-	},
+	}
 
 	removeFromList(e){		
 		var arr = this.state.listItems,
@@ -39,7 +40,7 @@ var App = React.createClass ({
 		checkedArr.splice( index, 1 )
 
 		this.setState({ listItems: arr, checkeds: checkedArr, listCount: tasksLeft})
-	},
+	}
 
 	handleCheckAll(e){
 		var arr = this.state.checkeds,
@@ -55,7 +56,7 @@ var App = React.createClass ({
 		numOfCheckedItems = checkedItems.filter( item => item != true).length;
 
 		this.setState({checkAll: checkedBtn ,checkeds: checkedItems, listCount: numOfCheckedItems})
-	},
+	}
 
 	handleCheck(e){
 		var arr = this.state.listItems,
@@ -76,34 +77,34 @@ var App = React.createClass ({
 			checkAllBtn = false;
 
 		this.setState({checkeds: checkedArr, listCount: tasksLeft, checkAll: checkAllBtn})
-	},	
+	}
 
 	eachItem(item, i){
 			return <li key={i} className="listItem">
-						<input className="itemCheckbox" checked={this.state.checkeds[i]} type="checkbox" onChange={this.handleCheck} />
+						<input className="itemCheckbox" checked={this.state.checkeds[i]} type="checkbox" onChange={this.handleCheck.bind(this)} />
 						<span className={ this.state.checkeds[i]? "listItemText complete" : "listItemText"}> { item } </span>
-						<button className="removeBtn" onClick={this.removeFromList}>x</button>
+						<button className="removeBtn" onClick={this.removeFromList.bind(this)}>x</button>
 				   </li>
-	},
+	}
 
 	renderInput(){
 		return <div className="todoInputWrap">
-					<input className="todoInput" placeholder="What needs to be done?" type="text" onKeyDown={this.addToList} />
+					<input className="todoInput" placeholder="What needs to be done?" type="text" onKeyDown={this.addToList.bind(this)} />
 				</div>			
-	},
+	}
 
 	renderList(){
 		return <div>
 					<input id="checkAll" type="checkbox" hidden />
-					<label className="checkAllBtn" htmlFor="checkAll" onClick={this.handleCheckAll}>\/</label>
+					<label className="checkAllBtn" htmlFor="checkAll" onClick={this.handleCheckAll.bind(this)}>\/</label>
 					<ul className="tasksList">
-						{this.state.listItems.map(this.eachItem)}
+						{this.state.listItems.map(this.eachItem.bind(this))}
 				   </ul>
 				   <div className="listStatus">
 				   		<span>{ this.state.listCount } tasks left</span>
 				   </div>
 			   </div>
-	},
+	}
 
 	render(){
 		return <div className="todoListContainer">
@@ -112,6 +113,5 @@ var App = React.createClass ({
 					{this.state.listItems.length > 0? this.renderList() : ''}
 				</div>	
 	}
-})
 
-export default App;
+}
