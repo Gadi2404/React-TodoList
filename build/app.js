@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import TasksList from './components/tasks-list';
 
 export default class App extends Component {
 
@@ -28,7 +29,7 @@ export default class App extends Component {
 		}
 	}
 
-	removeFromList(e){		
+	removeFromList(e){
 		var arr = this.state.listItems,
 			item = e.currentTarget.previousSibling,
 			index = arr.indexOf( item.textContent.trim() ),
@@ -48,7 +49,7 @@ export default class App extends Component {
 			numOfCheckedItems;
 
 		checkedBtn = !checkedBtn;
-		
+
 		// check/uncheck all items
 		var checkedItems = arr.map(item => item = checkedBtn )
 
@@ -60,12 +61,12 @@ export default class App extends Component {
 
 	handleCheck(e){
 		var arr = this.state.listItems,
-			item = e.currentTarget.nextSibling,
+			item = e.currentTarget.parentNode.nextSibling,
 			index = arr.indexOf( item.textContent.trim() ),
 			checkedArr = this.state.checkeds,
 			numOfItems = this.state.listCount,
 			tasksLeft,
-			checkAllBtn = this.state.checkAll; 
+			checkAllBtn = this.state.checkAll;
 
 		checkedArr[index] = !checkedArr[index];
 
@@ -79,39 +80,18 @@ export default class App extends Component {
 		this.setState({checkeds: checkedArr, listCount: tasksLeft, checkAll: checkAllBtn})
 	}
 
-	eachItem(item, i){
-			return <li key={i} className="listItem">
-						<input className="itemCheckbox" checked={this.state.checkeds[i]} type="checkbox" onChange={this.handleCheck.bind(this)} />
-						<span className={ this.state.checkeds[i]? "listItemText complete" : "listItemText"}> { item } </span>
-						<button className="removeBtn" onClick={this.removeFromList.bind(this)}>x</button>
-				   </li>
-	}
-
 	renderInput(){
 		return <div className="todoInputWrap">
 					<input className="todoInput" placeholder="What needs to be done?" type="text" onKeyDown={this.addToList.bind(this)} />
-				</div>			
-	}
-
-	renderList(){
-		return <div>
-					<input id="checkAll" type="checkbox" hidden />
-					<label className="checkAllBtn" htmlFor="checkAll" onClick={this.handleCheckAll.bind(this)}>\/</label>
-					<ul className="tasksList">
-						{this.state.listItems.map(this.eachItem.bind(this))}
-				   </ul>
-				   <div className="listStatus">
-				   		<span>{ this.state.listCount } tasks left</span>
-				   </div>
-			   </div>
+				</div>
 	}
 
 	render(){
 		return <div className="todoListContainer">
 					{this.renderInput()}
-					
-					{this.state.listItems.length > 0? this.renderList() : ''}
-				</div>	
+
+					{this.state.listItems.length > 0? <TasksList that={this} /> : ''}
+				</div>
 	}
 
 }

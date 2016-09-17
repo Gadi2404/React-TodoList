@@ -1,3 +1,6 @@
+var ExtractTextPlugin = require('extract-text-webpack-plugin'),
+	autoprefixer = require('autoprefixer');
+
 module.exports = {
 	entry: './build/main.js',
 	output: {
@@ -17,7 +20,17 @@ module.exports = {
 				query: {
 					presets: ['es2015', 'react']
 				}
-			}
+			},
+            {
+                test: /\.scss$/,
+                loader: ExtractTextPlugin.extract('css!sass!postcss')
+            }
 		]
-	}
+	},
+    plugins: [
+        new ExtractTextPlugin('dist/style.css', {
+            allChunks: true
+        })
+    ],
+    postcss: [ autoprefixer({ browsers: ['last 2 versions'] }) ]
 }
