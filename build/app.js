@@ -9,81 +9,76 @@ export default class App extends Component {
 		this.state = {
 			listItems : [],
 			listCount : 0,
-			checkeds : [],
-			checkAll : false
+			allChecked : false
 		}
 	}
 
 	addToList(e){
-		if( e.keyCode === 13 && e.currentTarget.value.trim() !== ''){
-			var arr = this.state.listItems,
-				checkedArr = this.state.checkeds,
-				checkedItems = checkedArr.filter(checked => checked === true).length;
+		e.preventDefault();
+		let target = e.currentTarget.childNodes[0];
 
-			arr.push(  e.currentTarget.value );
-			checkedArr.push( false );
+		if( target.value.trim() ){
+			let arr = this.state.listItems,
+				unCheckedItems;
 
-			e.currentTarget.value = '';
+			arr.push( { value: target.value, status: false } );
+			target.value = '';
 
-			this.setState({ listItems: arr, listCount: arr.length - checkedItems, checkeds: checkedArr })
+			unCheckedItems = arr.filter( item => item.status === false ).length;
+
+			this.setState({ listItems: arr, listCount: unCheckedItems })
 		}
 	}
 
 	removeFromList(e){
-		var arr = this.state.listItems,
-			item = e.currentTarget.previousSibling,
-			index = arr.indexOf( item.textContent.trim() ),
-			checkedArr = this.state.checkeds,
+		let arr = this.state.listItems,
+			index = +e.currentTarget.parentNode.getAttribute('data-index'),
+			itemObj = arr[index],
 			numOfItems = this.state.listCount,
-			tasksLeft = checkedArr[index]? numOfItems : --numOfItems;
+			tasksLeft = itemObj.status? numOfItems : --numOfItems;
 
 		arr.splice( index, 1 );
-		checkedArr.splice( index, 1 )
 
-		this.setState({ listItems: arr, checkeds: checkedArr, listCount: tasksLeft})
+		this.setState({ listItems: arr, listCount: tasksLeft})
 	}
 
-	handleCheckAll(e){
-		var arr = this.state.checkeds,
-			checkedBtn = this.state.checkAll,
-			numOfCheckedItems;
+	handleCheckAll(){
+		let arr = this.state.listItems,
+			checkedBtn = this.state.allChecked,
+			numOfUncheckedItems,
+			checkedItems;
 
 		checkedBtn = !checkedBtn;
 
 		// check/uncheck all items
-		var checkedItems = arr.map(item => item = checkedBtn )
+		arr.forEach(item => item.status = checkedBtn);
 
-		// count the number of checked items
-		numOfCheckedItems = checkedItems.filter( item => item != true).length;
+		numOfUncheckedItems = arr.filter( item => item.status === false ).length;
 
-		this.setState({checkAll: checkedBtn ,checkeds: checkedItems, listCount: numOfCheckedItems})
+		this.setState({listItems: arr, allChecked: checkedBtn, listCount: numOfUncheckedItems})
 	}
 
 	handleCheck(e){
-		var arr = this.state.listItems,
-			item = e.currentTarget.parentNode.nextSibling,
-			index = arr.indexOf( item.textContent.trim() ),
-			checkedArr = this.state.checkeds,
+		let arr = this.state.listItems,
+			index = +e.currentTarget.parentNode.parentNode.getAttribute('data-index'),
+			itemObj = arr[index],
 			numOfItems = this.state.listCount,
-			tasksLeft,
-			checkAllBtn = this.state.checkAll;
+			allBtnsChecked = this.state.allChecked,
+			tasksLeft;
 
-		checkedArr[index] = !checkedArr[index];
+		itemObj.status = !itemObj.status;
 
-		tasksLeft = checkedArr[index]? --numOfItems : ++numOfItems;
+		tasksLeft = itemObj.status? --numOfItems : ++numOfItems;
 
-		if( tasksLeft === 0 )
-			checkAllBtn = true;
-		else if( tasksLeft === arr.length )
-			checkAllBtn = false;
+		allBtnsChecked = tasksLeft === 0? true : false;
 
-		this.setState({checkeds: checkedArr, listCount: tasksLeft, checkAll: checkAllBtn})
+		this.setState({listItems: arr, listCount: tasksLeft, allChecked: allBtnsChecked})
 	}
 
 	renderInput(){
-		return <div className="todoInputWrap">
-					<input className="todoInput" placeholder="What needs to be done?" type="text" onKeyDown={this.addToList.bind(this)} />
-				</div>
+		return <form className="todoInputWrap" onSubmit={this.addToList.bind(this)}>
+					<input className="todoInput" placeholder="What needs to be done?" type="text" />
+				</form>
 	}
 
 	render(){

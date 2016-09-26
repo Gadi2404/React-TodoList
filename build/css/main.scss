@@ -13,6 +13,7 @@ body{
     background: $appColor;
     padding: 0;
     margin: 0;
+    font-family: 'Arial', sans-serif;
 }
 
 input{
@@ -53,16 +54,20 @@ button{
     background: $white;
 }
 
-.todoInput{
-    width: 100%;
-    height: 50px;
-    line-height: 50px;
-    padding: 10px 45px;
-    font-size: 1.3em;
+.todoInputWrap{
+    margin: 0;
 
-    &::placeholder{
-        font-style: italic;
-        color: rgba($grey, 0.3);
+    .todoInput{
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+        padding: 10px 45px;
+        font-size: 1.3em;
+
+        &::placeholder{
+            font-style: italic;
+            color: rgba($grey, 0.3);
+        }
     }
 }
 
@@ -163,7 +168,7 @@ button{
             right: 0;
             margin: auto;
             width: 3px;
-            height: 5px;
+            height: 7px;
             border:{
                 right: 1px solid currentColor;
                 bottom: 1px solid currentColor;
@@ -186,10 +191,37 @@ button{
 }
 
 .listStatus{
+    position: relative;
     height: 30px;
     line-height: 30px;
-    padding: 0 10px;
+    padding: 5px 10px;
     border-top: 1px solid rgba($black, 0.1);
+
+    .viewStatusBtns{
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 5px;
+        width: 30%;
+        margin: auto;
+    }
+
+    a{
+        text-decoration: none;
+        color: $black;
+        margin: 0 5px;
+        padding: 5px 10px;
+        transition: .2s box-shadow;
+        border-radius: 2px;
+
+        &:hover{
+            box-shadow: 0 0 0 1px rgba($grey, 0.7);
+        }
+
+        &.active{
+            box-shadow: 0 0 0 1px $grey;
+        }
+    }
 }
 
 .complete{
