@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {browserHistory} from 'react-router';
 import TasksList from './components/tasks-list';
 
 export default class App extends Component {
@@ -6,8 +7,20 @@ export default class App extends Component {
 	constructor(props){
 		super(props);
 
+		browserHistory.listen( location =>  {
+			if( !this.didMount ){
+				this.initialzeState();
+				return;
+			}
+			this.filterList(location.pathname);
+		});
+	}
+
+	initialzeState(){
 		this.state = {
 			listItems : [],
+			allItems : [],
+			currentList : [],
 			listCount : 0,
 			allChecked : false
 		}
@@ -18,7 +31,7 @@ export default class App extends Component {
 		let target = e.currentTarget.childNodes[0];
 
 		if( target.value.trim() ){
-			let arr = this.state.listItems,
+			let arr = this.state.allItems,
 				unCheckedItems;
 
 			arr.push( { value: target.value, status: false } );
@@ -26,12 +39,12 @@ export default class App extends Component {
 
 			unCheckedItems = arr.filter( item => item.status === false ).length;
 
-			this.setState({ listItems: arr, listCount: unCheckedItems })
+			this.setState({ allItems: arr, currentList: arr, listCount: unCheckedItems })
 		}
 	}
 
 	removeFromList(e){
-		let arr = this.state.listItems,
+		let arr = this.state.allItems,
 			index = +e.currentTarget.parentNode.getAttribute('data-index'),
 			itemObj = arr[index],
 			numOfItems = this.state.listCount,
@@ -39,11 +52,11 @@ export default class App extends Component {
 
 		arr.splice( index, 1 );
 
-		this.setState({ listItems: arr, listCount: tasksLeft})
+		this.setState({ allItems: arr, currentList: arr, listCount: tasksLeft})
 	}
 
 	handleCheckAll(){
-		let arr = this.state.listItems,
+		let arr = this.state.allItems,
 			checkedBtn = this.state.allChecked,
 			numOfUncheckedItems,
 			checkedItems;
@@ -55,11 +68,11 @@ export default class App extends Component {
 
 		numOfUncheckedItems = arr.filter( item => item.status === false ).length;
 
-		this.setState({listItems: arr, allChecked: checkedBtn, listCount: numOfUncheckedItems})
+		this.setState({allItems: arr, currentList: arr, allChecked: checkedBtn, listCount: numOfUncheckedItems})
 	}
 
 	handleCheck(e){
-		let arr = this.state.listItems,
+		let arr = this.state.allItems,
 			index = +e.currentTarget.parentNode.parentNode.getAttribute('data-index'),
 			itemObj = arr[index],
 			numOfItems = this.state.listCount,
@@ -72,20 +85,34 @@ export default class App extends Component {
 
 		allBtnsChecked = tasksLeft === 0? true : false;
 
-		this.setState({listItems: arr, listCount: tasksLeft, allChecked: allBtnsChecked})
+		this.setState({allItems: arr, currentList: arr, listCount: tasksLeft, allChecked: allBtnsChecked})
 	}
 
-	renderInput(){
-		return <form className="todoInputWrap" onSubmit={this.addToList.bind(this)}>
-					<input className="todoInput" placeholder="What needs to be done?" type="text" />
-				</form>
+	filterList(currentRoute){
+		let arr = this.state.allItems,
+			currentList;
+
+		if( currentRoute === '/active' )
+			currentList = arr.filter( item => item.status === false )
+		else if( currentRoute === '/completed' )
+			currentList = arr.filter( item => item.status === true )
+		else
+			currentList = arr
+
+		this.setState({ currentList: currentList })
+	}
+
+	componentDidMount(){
+		this.didMount = true;
 	}
 
 	render(){
 		return <div className="todoListContainer">
-					{this.renderInput()}
+					<form className="todoInputWrap" onSubmit={this.addToList.bind(this)}>
+						<input className="todoInput" placeholder="What needs to be done?" type="text" />
+					</form>
 
-					{this.state.listItems.length > 0? <TasksList that={this} /> : ''}
+					{this.state.allItems.length > 0? <TasksList that={this} /> : ''}
 				</div>
 	}
 
